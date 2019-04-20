@@ -14,6 +14,13 @@ const reducer = (state, action) => {
         ...state,
         contacts: [action.payload, ...state.contacts]
       };
+    case "UPDATE_CONTACT":
+      return {
+        ...state,
+        contacts: state.contacts.map(contact =>
+          contact.id === action.payload.id ? (contact = action.payload) : contact
+        )
+      };
     default:
       return state;
   }
@@ -21,28 +28,18 @@ const reducer = (state, action) => {
 
 export class Provider extends Component {
   state = {
-    contacts: [
-      {
-        id: 1,
-        name: "John Doe",
-        email: "jdoe@gmail.com",
-        phone: "+65-87654321"
-      },
-      {
-        id: 2,
-        name: "Karen Williams",
-        email: "kWilliams@gmail.com",
-        phone: "+65-12345678"
-      },
-      {
-        id: 3,
-        name: "Henry Johnson",
-        email: "hJohn@gmail.com",
-        phone: "+65-86576212"
-      }
-    ],
+    contacts: [],
     dispatch: action => this.setState(state => reducer(state, action))
   };
+
+  async componentDidMount() {
+    const res = await fetch("https://jsonplaceholder.typicode.com/users");
+    this.setState({ contacts: await res.json() });
+
+    // fetch("https://jsonplaceholder.typicode.com/users")
+    //   .then(res => res.json())
+    //   .then(data => this.setState({ contacts: data }));
+  }
 
   render() {
     return (
